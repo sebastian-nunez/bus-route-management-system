@@ -29,6 +29,50 @@
 
 4. **Modular Design:** The system's modular architecture enables the seamless addition of new features in the future.
 
+## Running Locally
+
+1. **Install `PostgreSQL` and other dependencies**
+
+   - Ensure you have `PostgreSQL` installed and can access the `psql` shell
+   - Install the project dependencies:
+
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+2. **Create `PostgresSQL` Database and Tables**
+
+   > This will create the necessary tables and populate them with sample data.
+
+   - Login into `psql` console: `psql -U postgres`
+   - Create the `bus_route_management` database: `CREATE DATABASE bus_route_management;`
+   - Open a terminal and run the following command:
+
+     ```bash
+     psql -U postgres -d bus_route_management -a -f setup_bus_routes.sql
+     ```
+
+   - **Note:** Replace `-U postgres` with your PostgreSQL username if it's different.
+
+3. **Update Database Credentials (.env)**
+
+   - Rename `.env.template` to `.env`
+   - Update the `POSTGRESSQL_PASSWORD` with the password for your `postgres` user account
+
+     ```bash
+     # example .env
+     POSTGRESSQL_HOST="localhost"
+     POSTGRESSQL_DATABASE_NAME="bus_route_management"
+     POSTGRESSQL_USER="postgres"
+     POSTGRESSQL_PASSWORD="1234"
+     ```
+
+4. **Run the Application**
+
+   ```bash
+   python3 main.py
+   ```
+
 ## Tables
 
 ### `Roles`
