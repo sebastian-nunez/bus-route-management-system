@@ -1,3 +1,16 @@
+-- Create Roles
+CREATE ROLE rider;
+CREATE ROLE driver;
+CREATE ROLE admin;
+-- Assign Table Ownership
+ALTER TABLE Routes OWNER TO admin;
+-- Rider Permissions
+GRANT SELECT ON TABLE Routes TO rider;
+-- Driver Permissions
+GRANT SELECT,
+    INSERT ON TABLE Routes TO driver;
+-- Admin Permissions
+GRANT ALL PRIVILEGES ON TABLE Routes TO admin;
 -- Create Roles Table
 CREATE TABLE Roles (
     role_id SERIAL PRIMARY KEY,

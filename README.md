@@ -38,6 +38,21 @@
 | role_id   | SERIAL       | PRIMARY KEY | Role ID     |
 | role_name | VARCHAR(255) | NOT NULL    | Role name   |
 
+#### Mappings _(role_id -> role_name)_
+
+| role_id | role_name |
+| ------- | --------- |
+| 1       | Driver    |
+| 2       | Rider     |
+| 3       | Admin     |
+
+#### Permissions
+
+- `Routes` Table
+  - **Riders** have `SELECT` access
+  - **Drivers** have `SELECT` and `INSERT`
+  - **Admins** have full privileges (`SELECT`, `INSERT`, `UPDATE`, `DELETE`, etc.)
+
 ### `Users`
 
 | Column   | Data Type    | Constraints      | Description  |
