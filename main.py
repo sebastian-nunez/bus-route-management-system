@@ -53,11 +53,14 @@ def main():
         while True:
             print('\n--------- Select ---------')
             if role_id == 1:  # Driver
-                pass # TODO: add the driver menu
+                driver = Driver(user_id)
+                driver.menu()
             elif role_id == 2:  # Rider
-                pass # TODO: add the rider menu
+                rider = Rider(user_id)
+                rider.menu()
             elif role_id == 3:  # Admin
-                pass # TODO: add the admin menu
+                admin = Admin(user_id)
+                admin.menu()
             else:
                 print("Unknown role. Try again!")
 
@@ -71,4 +74,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
+
+        selection = input("Do you want to quit? (y/n): ")
+        if selection.lower() == "y":
+            print('\n--------- Quit ---------')
+            print("Quitting the Bus Route Management System...")
+            break
