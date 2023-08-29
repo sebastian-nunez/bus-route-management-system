@@ -16,6 +16,7 @@ conn = psycopg2.connect(
 # Create a cursor
 cursor = conn.cursor()
 
+
 class User(ABC):
     def __init__(self, user_id: int):
         self.user_id = user_id
@@ -64,6 +65,51 @@ class Rider(User):
         else:
             print("Invalid selection.")
 
+
+class Driver(User):
+    def __init__(self, user_id: int):
+        super().__init__(user_id)
+
+    def view_assigned_routes(self):
+        query = """
+        SELECT Routes.route_id, Routes.route_name, Routes.start_point, Routes.end_point, Routes.distance
+        FROM DriverRoutes
+        JOIN Routes ON DriverRoutes.route_id = Routes.route_id
+        WHERE DriverRoutes.driver_id = %s
+        """
+        cursor.execute(query, (self.user_id,))
+        assigned_routes = cursor.fetchall()
+
+        print("Assigned Routes:")
+        for route in assigned_routes:
+            print("Route ID:", route[0])
+            print("Route Name:", route[1])
+            print("Start Point:", route[2])
+            print("End Point:", route[3])
+            print("Distance (miles):", route[4])
+            print("---------------------------")
+
+    def update_route_information(self, route_id: int, new_distance: float):
+        query = "UPDATE Routes SET distance = %s WHERE route_id = %s"
+        cursor.execute(query, (new_distance, route_id))
+        conn.commit()
+        print(f"Route {route_id} distance updated to {new_distance}mi")
+
+    def menu(self):
+        print("Driver Menu")
+        print("1. View Assigned Routes")
+        print("2. Update Route Information")
+        selection = int(input("Make a selection: "))
+        print("---------------------------")
+
+        if selection == 1:
+            self.view_assigned_routes()
+        elif selection == 2:
+            route_id = int(input("Enter the Route ID: "))
+            new_distance = float(input("Enter the new distance (miles): "))
+            self.update_route_information(route_id, new_distance)
+        else:
+            print("Invalid selection.")
 
 def main():
     # welcome text
