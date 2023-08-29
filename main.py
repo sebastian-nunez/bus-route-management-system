@@ -356,17 +356,20 @@ def main():
         while True:
             print('\n--------- Select ---------')
 
-            if role_id == 1:  # Driver
-                driver = Driver(user_id)
-                driver.menu()
-            elif role_id == 2:  # Rider
-                rider = Rider(user_id)
-                rider.menu()
-            elif role_id == 3:  # Admin
-                admin = Admin(user_id)
-                admin.menu()
-            else:
-                print("Unknown role. Try again!")
+            try:
+                if role_id == 1:  # Driver
+                    driver = Driver(user_id)
+                    driver.menu()
+                elif role_id == 2:  # Rider
+                    rider = Rider(user_id)
+                    rider.menu()
+                elif role_id == 3:  # Admin
+                    admin = Admin(user_id)
+                    admin.menu()
+                else:
+                    print("Unknown role. Try again!")
+            except ValueError:
+                        print("Invalid input!")
 
             # logout option
             selection = input("Do you want to logout? (y/n): ")
