@@ -93,6 +93,7 @@ class Driver(User):
         query = "UPDATE Routes SET distance = %s WHERE route_id = %s"
         cursor.execute(query, (new_distance, route_id))
         conn.commit()
+
         print(f"Route {route_id} distance updated to {new_distance}mi")
 
     def menu(self):
@@ -110,6 +111,95 @@ class Driver(User):
             self.update_route_information(route_id, new_distance)
         else:
             print("Invalid selection.")
+
+
+class Admin(User):
+    def __init__(self, user_id: int):
+        super().__init__(user_id)
+
+    def view_available_routes(self):
+        query = "SELECT route_id, route_name, start_point, end_point, distance FROM Routes"
+        cursor.execute(query)
+        available_routes = cursor.fetchall()
+
+        print("Available Routes:")
+        for route in available_routes:
+            print("Route ID:", route[0])
+            print("Route Name:", route[1])
+            print("Start Point:", route[2])
+            print("End Point:", route[3])
+            print("Distance (miles):", route[4])
+            print("---------------------")
+
+    def change_password(self, user_id: int, new_password: str):
+        query = "UPDATE Users SET password = %s WHERE user_id = %s"
+        cursor.execute(query, (new_password, user_id))
+        conn.commit()
+
+        print(f"Changed the password of user {user_id}!")
+
+    def view_all_users(self):
+        query = """
+        SELECT Users.user_id, Users.username, Users.password, Roles.role_name
+        FROM Users
+        JOIN Roles ON Users.role_id = Roles.role_id
+        """
+        cursor.execute(query)
+        users = cursor.fetchall()
+
+        print("All Users:")
+        for user in users:
+            print("User ID:", user[0])
+            print("Username:", user[1])
+            print("Password:", user[2])
+            print("Role:", user[3])
+            print("---------------------------")
+
+    def add_new_route(self, route_name, start_point, end_point, distance):
+        query = """
+        INSERT INTO Routes (route_name, start_point, end_point, distance)
+        VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (route_name, start_point, end_point, distance))
+        conn.commit()
+        print("New route added successfully.")
+
+    def remove_route(self, route_id):
+        query = "DELETE FROM Routes WHERE route_id = %s"
+        cursor.execute(query, (route_id,))
+        conn.commit()
+        print("Route removed successfully.")
+
+    def menu(self):
+        print("Admin Menu")
+        print("1. View All Users")
+        print("2. Change Password")
+        print("3. View Available Routes")
+        print("4. Add New Route")
+        print("5. Remove Route")
+        selection = int(input("Make a selection: "))
+        print("---------------------------")
+
+        if selection == 1:
+            self.view_all_users()
+        elif selection == 2:
+            user_id = int(input("Enter the User ID: "))
+            new_password = input("Enter the new password: ")
+            self.change_password(user_id, new_password)
+        elif selection == 3:
+            self.view_available_routes()
+        elif selection == 4:
+            route_name = input("Enter the route name: ")
+            start_point = input("Enter the start point: ")
+            end_point = input("Enter the end point: ")
+            distance = float(input("Enter the distance (miles): "))
+            self.add_new_route(route_name, start_point, end_point, distance)
+        elif selection == 5:
+            route_id = int(input("Enter the Route ID: "))
+            self.remove_route(route_id)
+        else:
+            print("Invalid selection.")
+
 
 def main():
     # welcome text
@@ -139,6 +229,7 @@ def main():
 
         while True:
             print('\n--------- Select ---------')
+
             if role_id == 1:  # Driver
                 driver = Driver(user_id)
                 driver.menu()
@@ -151,6 +242,7 @@ def main():
             else:
                 print("Unknown role. Try again!")
 
+            # logout option
             selection = input("Do you want to logout? (y/n): ")
             if selection.lower() == "y":
                 print('\n--------- Logout ---------')
