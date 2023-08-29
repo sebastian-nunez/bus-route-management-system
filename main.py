@@ -24,6 +24,47 @@ class User(ABC):
     def menu(self):
         pass
 
+
+class Rider(User):
+    def __init__(self, user_id: int):
+        super().__init__(user_id)
+
+    def view_available_routes(self):
+        query = "SELECT route_id, route_name, start_point, end_point FROM Routes"
+        cursor.execute(query)
+        available_routes = cursor.fetchall()
+
+        print("Available Routes:")
+        for route in available_routes:
+            print("Route ID:", route[0])
+            print("Route Name:", route[1])
+            print("Start Point:", route[2])
+            print("End Point:", route[3])
+            print("---------------------")
+
+    def express_interest(self, route_id: int):
+        query = "INSERT INTO RiderRoutes (rider_id, route_id) VALUES (%s, %s)"
+        cursor.execute(query, (self.user_id, route_id))
+        conn.commit()
+
+        print(f"Success! Route {route_id} was added for Rider {self.user_id}.")
+
+    def menu(self):
+        print("Rider Menu")
+        print("1. View Available Routes")
+        print("2. Express Interest in a Route")
+        selection = int(input("Make a selection: "))
+        print("---------------------------")
+
+        if selection == 1:
+            self.view_available_routes()
+        elif selection == 2:
+            route_id = int(input("Enter the Route ID: "))
+            self.express_interest(route_id)
+        else:
+            print("Invalid selection.")
+
+
 def main():
     # welcome text
     print(r"""
