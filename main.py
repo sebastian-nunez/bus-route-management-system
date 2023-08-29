@@ -30,20 +30,68 @@ class Rider(User):
     def __init__(self, user_id: int):
         super().__init__(user_id)
 
+    def view_all_routes(self):
+        query = """
+        SELECT route_id, route_name, start_point, end_point
+        FROM Routes
+        """
+        cursor.execute(query, (self.user_id,))
+        all_routes = cursor.fetchall()
+
+        print("All Routes:")
+        for route in all_routes:
+            print(f"Route ID: {route[0]}")
+            print(f"Route Name: {route[1]}")
+            print(f"Start Point: {route[2]}")
+            print(f"End Point: {route[3]}")
+            print("---------------------------")
+
+    def view_interested_routes(self):
+        query = """
+        SELECT Routes.route_id, Routes.route_name, Routes.start_point, Routes.end_point
+        FROM Routes
+        INNER JOIN RiderRoutes ON Routes.route_id = RiderRoutes.route_id
+        WHERE RiderRoutes.rider_id = %s
+        """
+        cursor.execute(query, (self.user_id,))
+        interested_routes = cursor.fetchall()
+
+        print("Interested Routes:")
+        for route in interested_routes:
+            print(f"Route ID: {route[0]}")
+            print(f"Route Name: {route[1]}")
+            print(f"Start Point: {route[2]}")
+            print(f"End Point: {route[3]}")
+            print("---------------------------")
+
     def view_available_routes(self):
-        query = "SELECT route_id, route_name, start_point, end_point FROM Routes"
-        cursor.execute(query)
+        query = """
+        SELECT route_id, route_name, start_point, end_point
+        FROM Routes
+        WHERE route_id NOT IN (
+            SELECT route_id FROM RiderRoutes WHERE rider_id = %s
+        )
+        """
+        cursor.execute(query, (self.user_id,))
         available_routes = cursor.fetchall()
 
         print("Available Routes:")
         for route in available_routes:
-            print("Route ID:", route[0])
-            print("Route Name:", route[1])
-            print("Start Point:", route[2])
-            print("End Point:", route[3])
-            print("---------------------")
+            print(f"Route ID: {route[0]}")
+            print(f"Route Name: {route[1]}")
+            print(f"Start Point: {route[2]}")
+            print(f"End Point: {route[3]}")
+            print("---------------------------")
 
     def express_interest(self, route_id: int):
+        query = "SELECT route_id FROM RiderRoutes WHERE rider_id = %s"
+        cursor.execute(query, (self.user_id,))
+        matched_routes = cursor.fetchall()
+
+        if matched_routes:
+            print(f"You have already expressed interest in Route {route_id}!")
+            return
+
         query = "INSERT INTO RiderRoutes (rider_id, route_id) VALUES (%s, %s)"
         cursor.execute(query, (self.user_id, route_id))
         conn.commit()
@@ -52,14 +100,19 @@ class Rider(User):
 
     def menu(self):
         print("Rider Menu")
-        print("1. View Available Routes")
-        print("2. Express Interest in a Route")
+        print("1. View All Routes")
+        print("2. View Interested Routes")
+        print("3. Express Interest in a Route")
         selection = int(input("Make a selection: "))
         print("---------------------------")
 
         if selection == 1:
-            self.view_available_routes()
+            self.view_all_routes()
         elif selection == 2:
+            self.view_interested_routes()
+        elif selection == 3:
+            self.view_available_routes()
+
             route_id = int(input("Enter the Route ID: "))
             self.express_interest(route_id)
         else:
@@ -82,11 +135,11 @@ class Driver(User):
 
         print("Assigned Routes:")
         for route in assigned_routes:
-            print("Route ID:", route[0])
-            print("Route Name:", route[1])
-            print("Start Point:", route[2])
-            print("End Point:", route[3])
-            print("Distance (miles):", route[4])
+            print(f"Route ID: {route[0]}")
+            print(f"Route Name: {route[1]}")
+            print(f"Start Point: {route[2]}")
+            print(f"End Point: {route[3]}")
+            print(f"Distance (miles): {route[4]}")
             print("---------------------------")
 
     def update_route_information(self, route_id: int, new_distance: float):
@@ -117,19 +170,19 @@ class Admin(User):
     def __init__(self, user_id: int):
         super().__init__(user_id)
 
-    def view_available_routes(self):
+    def view_all_routes(self):
         query = "SELECT route_id, route_name, start_point, end_point, distance FROM Routes"
         cursor.execute(query)
-        available_routes = cursor.fetchall()
+        all_routes = cursor.fetchall()
 
-        print("Available Routes:")
-        for route in available_routes:
-            print("Route ID:", route[0])
-            print("Route Name:", route[1])
-            print("Start Point:", route[2])
-            print("End Point:", route[3])
-            print("Distance (miles):", route[4])
-            print("---------------------")
+        print("All Routes:")
+        for route in all_routes:
+            print(f"Route ID: {route[0]}")
+            print(f"Route Name: {route[1]}")
+            print(f"Start Point: {route[2]}")
+            print(f"End Point: {route[3]}")
+            print(f"Distance (miles): {route[4]}")
+            print("---------------------------")
 
     def change_password(self, user_id: int, new_password: str):
         query = "UPDATE Users SET password = %s WHERE user_id = %s"
@@ -149,10 +202,10 @@ class Admin(User):
 
         print("All Users:")
         for user in users:
-            print("User ID:", user[0])
-            print("Username:", user[1])
-            print("Password:", user[2])
-            print("Role:", user[3])
+            print(f"User ID: {user[0]}")
+            print(f"Username: {user[1]}")
+            print(f"Password: {user[2]}")
+            print(f"Role: {user[3]}")
             print("---------------------------")
 
     def add_new_route(self, route_name, start_point, end_point, distance):
@@ -162,21 +215,86 @@ class Admin(User):
         """
         cursor.execute(query, (route_name, start_point, end_point, distance))
         conn.commit()
-        print("New route added successfully.")
 
-    def remove_route(self, route_id):
+        print(f"Route {route_name} added successfully.")
+
+    def remove_route(self, route_id: int):
         query = "DELETE FROM Routes WHERE route_id = %s"
         cursor.execute(query, (route_id,))
         conn.commit()
-        print("Route removed successfully.")
+
+        print(f"Route {route_id} removed successfully.")
+
+    def display_drivers(self):
+        query = """
+        SELECT Users.user_id, Users.username, Roles.role_name
+        FROM Users
+        INNER JOIN Roles ON Users.role_id = Roles.role_id
+        WHERE Roles.role_name = 'Driver';
+        """
+        cursor.execute(query)
+        drivers = cursor.fetchall()
+
+        print("All Drivers:")
+        for driver in drivers:
+            print(f"Driver ID: {driver[0]}")
+            print(f"Username: {driver[1]}")
+            print(f"Role: {driver[2]}")
+            print("---------------------------")
+
+    def check_driver_exists(self, driver_id):
+        query = "SELECT EXISTS(SELECT 1 FROM Users WHERE user_id = %s AND role_id = 1)"
+        cursor.execute(query, (driver_id,))
+        return cursor.fetchone()[0]
+
+    def check_route_exists(self, route_id):
+        query = "SELECT EXISTS(SELECT 1 FROM Routes WHERE route_id = %s)"
+        cursor.execute(query, (route_id,))
+        return cursor.fetchone()[0]
+
+    def assign_route(self, route_id: int, driver_id: int):
+        if not self.check_route_exists(route_id):
+            print(f"Route {route_id} does not exist!")
+            return
+
+        if not self.check_driver_exists(driver_id):
+            print(f"Driver {driver_id} does not exist! Unable to assign Route {route_id}.")
+            return
+
+        query = """
+        INSERT INTO DriverRoutes (driver_id, route_id)
+        VALUES (%s, %s);
+        """
+        cursor.execute(query, (driver_id, route_id))
+        conn.commit()
+
+        print(f"Route{route_id} assigned to Driver {driver_id}.")
+
+    def view_assigned_routes(self):
+        query = """
+        SELECT Routes.route_id, Routes.route_name, Users.user_id, Users.username
+        FROM Routes
+        INNER JOIN DriverRoutes ON Routes.route_id = DriverRoutes.route_id
+        INNER JOIN Users ON DriverRoutes.driver_id = Users.user_id;
+        """
+        cursor.execute(query)
+        assigned_routes = cursor.fetchall()
+
+        print("All Assigned Routes:")
+        for route in assigned_routes:
+            print(f"{route[1]} ({route[0]}) assigned to {route[3]} ({route[2]})")
+
+        print("---------------------------")
 
     def menu(self):
         print("Admin Menu")
         print("1. View All Users")
         print("2. Change Password")
-        print("3. View Available Routes")
+        print("3. View All Routes")
         print("4. Add New Route")
         print("5. Remove Route")
+        print("6. Assign a Route")
+        print("7. View Assigned Routes")
         selection = int(input("Make a selection: "))
         print("---------------------------")
 
@@ -187,7 +305,7 @@ class Admin(User):
             new_password = input("Enter the new password: ")
             self.change_password(user_id, new_password)
         elif selection == 3:
-            self.view_available_routes()
+            self.view_all_routes()
         elif selection == 4:
             route_name = input("Enter the route name: ")
             start_point = input("Enter the start point: ")
@@ -197,6 +315,14 @@ class Admin(User):
         elif selection == 5:
             route_id = int(input("Enter the Route ID: "))
             self.remove_route(route_id)
+        elif selection == 6:
+            self.display_drivers()
+
+            route_id = int(input("Enter the Route ID: "))
+            driver_id = int(input("Enter the Driver ID: "))
+            self.assign_route(route_id, driver_id)
+        elif selection == 7:
+            self.view_assigned_routes()
         else:
             print("Invalid selection.")
 

@@ -8,8 +8,9 @@
 
    1. **Riders**
 
-      1. View available routes
-      2. Express interest in specific routes
+      1. View all routes
+      2. View interested routes
+      3. Express interest in specific routes
 
    2. **Drivers**
 
@@ -22,6 +23,8 @@
       3. View available routes
       4. Create new routes
       5. Remove existing routes
+      6. Assign a route
+      7. View all assigned routes
 
 2. **Database Backend:** Utilizing a `PostgreSQL` database, the system stores user data, bus route details, and associations between drivers and routes.
 
