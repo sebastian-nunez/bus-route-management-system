@@ -369,7 +369,7 @@ def main():
                 else:
                     print("Unknown role. Try again!")
             except ValueError:
-                        print("Invalid input!")
+                print("Invalid input!")
 
             # logout option
             selection = input("Do you want to logout? (y/n): ")
