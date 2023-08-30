@@ -17,6 +17,60 @@ conn = psycopg2.connect(
 cursor = conn.cursor()
 
 
+def main():
+    # welcome text
+    print(r"""
+                           _____   ___   _   _
+                          |  ___| |_ _| | | | |
+                          | |_     | |  | | | |
+                          |  _|    | |  | |_| |
+                          |_|     |___|  \___/
+
+                        Bus Route Management System
+                               Version 1.0
+    """)
+    print('--------- Login ---------')
+    username = input("Username: ")
+    password = input("Password: ")
+
+    # login
+    auth_query = "SELECT role_id, user_id FROM Users WHERE username = %s AND password = %s"
+    cursor.execute(auth_query, (username, password))
+    user_info = cursor.fetchone()
+
+    # display menus
+    if user_info:
+        print("Login successful!")
+        role_id, user_id = user_info
+
+        while True:
+            print('\n--------- Select ---------')
+
+            try:
+                if role_id == 1:  # Driver
+                    driver = Driver(user_id)
+                    driver.menu()
+                elif role_id == 2:  # Rider
+                    rider = Rider(user_id)
+                    rider.menu()
+                elif role_id == 3:  # Admin
+                    admin = Admin(user_id)
+                    admin.menu()
+                else:
+                    print("Unknown role. Try again!")
+            except ValueError:
+                print("Invalid input!")
+
+            # logout option
+            selection = input("Do you want to logout? (y/n): ")
+            if selection.lower() == "y":
+                print('\n--------- Logout ---------')
+                print("Logging off...")
+                break
+    else:
+        print("User not found. Unable to login!")
+
+
 class User(ABC):
     def __init__(self, user_id: int):
         self.user_id = user_id
@@ -375,60 +429,6 @@ class Admin(User):
             self.view_assigned_routes()
         else:
             print("Invalid selection.")
-
-
-def main():
-    # welcome text
-    print(r"""
-                           _____   ___   _   _
-                          |  ___| |_ _| | | | |
-                          | |_     | |  | | | |
-                          |  _|    | |  | |_| |
-                          |_|     |___|  \___/
-
-                        Bus Route Management System
-                               Version 1.0
-    """)
-    print('--------- Login ---------')
-    username = input("Username: ")
-    password = input("Password: ")
-
-    # login
-    auth_query = "SELECT role_id, user_id FROM Users WHERE username = %s AND password = %s"
-    cursor.execute(auth_query, (username, password))
-    user_info = cursor.fetchone()
-
-    # display menus
-    if user_info:
-        print("Login successful!")
-        role_id, user_id = user_info
-
-        while True:
-            print('\n--------- Select ---------')
-
-            try:
-                if role_id == 1:  # Driver
-                    driver = Driver(user_id)
-                    driver.menu()
-                elif role_id == 2:  # Rider
-                    rider = Rider(user_id)
-                    rider.menu()
-                elif role_id == 3:  # Admin
-                    admin = Admin(user_id)
-                    admin.menu()
-                else:
-                    print("Unknown role. Try again!")
-            except ValueError:
-                print("Invalid input!")
-
-            # logout option
-            selection = input("Do you want to logout? (y/n): ")
-            if selection.lower() == "y":
-                print('\n--------- Logout ---------')
-                print("Logging off...")
-                break
-    else:
-        print("User not found. Unable to login!")
 
 
 if __name__ == "__main__":
