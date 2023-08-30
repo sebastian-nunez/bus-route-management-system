@@ -21,6 +21,26 @@ class User(ABC):
     def __init__(self, user_id: int):
         self.user_id = user_id
 
+    def check_user_exists(self, user_id):
+        query = "SELECT EXISTS(SELECT 1 FROM Users WHERE user_id = %s)"
+        cursor.execute(query, (user_id,))
+        return cursor.fetchone()[0]
+
+    def check_driver_exists(self, driver_id):
+        query = "SELECT EXISTS(SELECT 1 FROM Users WHERE user_id = %s AND role_id = 1)"
+        cursor.execute(query, (driver_id,))
+        return cursor.fetchone()[0]
+
+    def check_route_exists(self, route_id):
+        query = "SELECT EXISTS(SELECT 1 FROM Routes WHERE route_id = %s)"
+        cursor.execute(query, (route_id,))
+        return cursor.fetchone()[0]
+
+    def check_route_assigned(self, route_id):
+        query = "SELECT EXISTS(SELECT 1 FROM DriverRoutes WHERE route_id = %s)"
+        cursor.execute(query, (route_id,))
+        return cursor.fetchone()[0]
+
     @abstractmethod
     def menu(self):
         pass
@@ -65,6 +85,7 @@ class Rider(User):
             print("---------------------------")
 
     def view_available_routes(self):
+        # routes for which the rider has NOT already expressed interest in
         query = """
         SELECT route_id, route_name, start_point, end_point
         FROM Routes
@@ -84,6 +105,11 @@ class Rider(User):
             print("---------------------------")
 
     def express_interest(self, route_id: int):
+        if not self.check_route_exists(route_id):
+            print(
+                f"Route {route_id} does not exist! Unable to express interest for Rider {self.user_id}.")
+            return
+
         query = "SELECT route_id FROM RiderRoutes WHERE rider_id = %s"
         cursor.execute(query, (self.user_id,))
         matched_routes = cursor.fetchall()
@@ -143,6 +169,15 @@ class Driver(User):
             print("---------------------------")
 
     def update_route_information(self, route_id: int, new_distance: float):
+        if not self.check_route_exists(route_id):
+            print(
+                f"Route {route_id} does not exist! Unable to update distance to {new_distance}mi.")
+            return
+
+        if new_distance < 0:
+            print(f"The new distance must be greater than 0 miles!")
+            return
+
         query = "UPDATE Routes SET distance = %s WHERE route_id = %s"
         cursor.execute(query, (new_distance, route_id))
         conn.commit()
@@ -185,6 +220,14 @@ class Admin(User):
             print("---------------------------")
 
     def change_password(self, user_id: int, new_password: str):
+        if not self.check_user_exists(user_id):
+            print(f"User {user_id} does not exist! Unable to change password.")
+            return
+
+        if not new_password:
+            print(f"New password must not be empty!")
+            return
+
         query = "UPDATE Users SET password = %s WHERE user_id = %s"
         cursor.execute(query, (new_password, user_id))
         conn.commit()
@@ -219,8 +262,23 @@ class Admin(User):
         print(f"Route {route_name} added successfully.")
 
     def remove_route(self, route_id: int):
-        query = "DELETE FROM Routes WHERE route_id = %s"
-        cursor.execute(query, (route_id,))
+        if not self.check_route_exists(route_id):
+            print(f"Route {route_id} does not exist! Unable to remove.")
+            return
+
+        if self.check_route_assigned(route_id):
+            print(
+                f"Route {route_id} is assigned to drivers. Unassign the route before removing.")
+            return
+
+        # remove the route from RiderRoutes table
+        query_rider_routes = "DELETE FROM RiderRoutes WHERE route_id = %s"
+        cursor.execute(query_rider_routes, (route_id,))
+        conn.commit()
+
+        # remove the route from Routes table
+        query_remove_route = "DELETE FROM Routes WHERE route_id = %s"
+        cursor.execute(query_remove_route, (route_id,))
         conn.commit()
 
         print(f"Route {route_id} removed successfully.")
@@ -242,23 +300,14 @@ class Admin(User):
             print(f"Role: {driver[2]}")
             print("---------------------------")
 
-    def check_driver_exists(self, driver_id):
-        query = "SELECT EXISTS(SELECT 1 FROM Users WHERE user_id = %s AND role_id = 1)"
-        cursor.execute(query, (driver_id,))
-        return cursor.fetchone()[0]
-
-    def check_route_exists(self, route_id):
-        query = "SELECT EXISTS(SELECT 1 FROM Routes WHERE route_id = %s)"
-        cursor.execute(query, (route_id,))
-        return cursor.fetchone()[0]
-
     def assign_route(self, route_id: int, driver_id: int):
         if not self.check_route_exists(route_id):
             print(f"Route {route_id} does not exist!")
             return
 
         if not self.check_driver_exists(driver_id):
-            print(f"Driver {driver_id} does not exist! Unable to assign Route {route_id}.")
+            print(
+                f"Driver {driver_id} does not exist! Unable to assign Route {route_id}.")
             return
 
         query = """
@@ -282,7 +331,8 @@ class Admin(User):
 
         print("All Assigned Routes:")
         for route in assigned_routes:
-            print(f"{route[1]} ({route[0]}) assigned to {route[3]} ({route[2]})")
+            print(
+                f"{route[1]} ({route[0]}) assigned to {route[3]} ({route[2]})")
 
         print("---------------------------")
 
