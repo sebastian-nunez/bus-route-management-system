@@ -2,6 +2,19 @@
 
 > A command line interface (CLI) designed to ease the management of a bus transportation network. This system provides a streamlined way for administrators, drivers, and riders to interact with the system according to their respective roles.
 
+## Table of Contents
+
+- [Demo](#demo)
+- [Features](#features)
+- [Tables](#tables)
+  - [`Roles`](#roles)
+  - [`Users`](#users)
+  - [`Routes`](#routes)
+  - [`DriverRoutes`](#driverroutes)
+  - [`RiderRoutes`](#riderroutes)
+- [Relationships](#relationships)
+- [Running Locally](#running-locally)
+
 ## Demo
 
 ![demo](demo_1.gif)
