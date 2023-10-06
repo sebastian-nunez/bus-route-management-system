@@ -4,8 +4,8 @@
 
 ## Table of Contents
 
-- [Demo](#demo)
 - [Features](#features)
+- [Demo](#demo)
 - [Tables](#tables)
   - [`Roles`](#roles)
   - [`Users`](#users)
@@ -14,10 +14,6 @@
   - [`RiderRoutes`](#riderroutes)
 - [Relationships](#relationships)
 - [Running Locally](#running-locally)
-
-## Demo
-
-![demo](demo_1.gif)
 
 ## Features
 
@@ -48,6 +44,10 @@
 3. **Command Line Interface:** Users interact with the system through a command line interface, which presents clear menus and prompts based on their respective roles.
 
 4. **Modular Design:** The system's modular architecture enables the seamless addition of new features in the future.
+
+## Demo
+
+![demo](demo_1.gif)
 
 ## Tables
 
