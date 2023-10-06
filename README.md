@@ -2,6 +2,10 @@
 
 > A command line interface (CLI) designed to ease the management of a bus transportation network. This system provides a streamlined way for administrators, drivers, and riders to interact with the system according to their respective roles.
 
+## Demo
+
+![demo](demo_1.gif)
+
 ## Features
 
 1. **Role-Based Access:** Each role is granted access to specific functions aligned with their responsibilities.
@@ -138,15 +142,19 @@
    ```bash
    python3 main.py
    ```
+
 5. **Login Credentials**
+
    - **Admin**
-      - **Username:** admin1
-      - **Password:** 1234
-    
+
+     - **Username:** admin1
+     - **Password:** 1234
+
    - **Driver**
-      - **Username:** driver1
-      - **Password:** 1234
-        
+
+     - **Username:** driver1
+     - **Password:** 1234
+
    - **Rider**
-      - **Username:** rider1
-      - **Password:** 1234
+     - **Username:** rider1
+     - **Password:** 1234
