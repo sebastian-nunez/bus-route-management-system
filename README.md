@@ -2,10 +2,6 @@
 
 > A command line interface (CLI) designed to ease the management of a bus transportation network. This system provides a streamlined way for administrators, drivers, and riders to interact with the system according to their respective roles.
 
-## Demo
-
-![demo](demo_1.gif)
-
 ## Features
 
 1. **Role-Based Access:** Each role is granted access to specific functions aligned with their responsibilities.
@@ -35,6 +31,10 @@
 3. **Command Line Interface:** Users interact with the system through a command line interface, which presents clear menus and prompts based on their respective roles.
 
 4. **Modular Design:** The system's modular architecture enables the seamless addition of new features in the future.
+
+## Demo
+
+![demo](demo_1.gif)
 
 ## Tables
 
