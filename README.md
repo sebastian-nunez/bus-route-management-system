@@ -138,3 +138,15 @@
    ```bash
    python3 main.py
    ```
+5. **Login Credentials**
+   - **Admin**
+      - **Username:** admin1
+      - **Password:** 1234
+    
+   - **Driver**
+      - **Username:** driver1
+      - **Password:** 1234
+        
+   - **Rider**
+      - **Username:** rider1
+      - **Password:** 1234
