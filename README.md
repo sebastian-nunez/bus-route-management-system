@@ -4,7 +4,6 @@
 
 ## Table of Contents
 
-- [Demo](#demo)
 - [Features](#features)
 - [Getting Started](#getting-started)
 - [Tables](#tables)
